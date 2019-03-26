@@ -1,4 +1,4 @@
-CXX = g++
+CXX = g++-8
 FLAGS = -std=c++17 -Wall -g 
 #SRC_DIR = src
 #SRC = $(wildcard $(SRC_DIR)/*.cpp)
