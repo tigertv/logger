@@ -8,7 +8,7 @@ SRC = $(wildcard *.cpp)
 TESTS = test
 OBJ := $(SRC:.cpp=.o)
 
-.PHONY: all clean 
+.PHONY: all clean test-run
 
 all: liblogger.so
 
@@ -23,6 +23,7 @@ liblogger.so: logger.so.o
 
 test: test.cpp liblogger.so
 	$(CXX) -I. -L. $(FLAGS) $< -Wl,-rpath=. -llogger -pthread -lboost_unit_test_framework -o $@
-
+test-run: test
+	./$<
 clean: 
 	rm -rf *.o *.so $(TESTS)

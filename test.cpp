@@ -1,3 +1,7 @@
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE LoggerTestModule
+#include <boost/test/unit_test.hpp>
+
 #include <iostream>
 #include <string>
 #include <thread>
@@ -7,9 +11,23 @@
 #include <stdexcept>
 #include "logger.h"
 
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE MyTest
-#include <boost/test/unit_test.hpp>
+BOOST_AUTO_TEST_SUITE(LoggerTestSuite)
+
+int getFileLines(std::string filePath) {
+	// check lines
+	int count = 0;
+	std::string line;
+	std::ifstream file(filePath);
+	while (getline(file, line))
+		count++;
+	return count;
+}
+
+MessageType getRandomMsgType() {
+	std::random_device rd;
+	std::uniform_int_distribution<int> dist2(0, (int)MessageType::ERROR);
+	return (MessageType)dist2(rd);
+}
 
 void threadFunc(Logger* log, int id) {
 	log->info("Thread " + std::to_string(id) + " begins");
@@ -20,29 +38,35 @@ void threadFunc(Logger* log, int id) {
 	int delay =  dist(rd);
 	std::this_thread::sleep_for(std::chrono::seconds(delay));
 
-	std::uniform_int_distribution<int> dist2(0, (int)MessageType::ERROR);
-	int msgType =  dist2(rd);
-	log->message((MessageType)msgType, "Thread " +
-										std::to_string(id) + " Result");
+	// each thread produces 100000 messages
+	for (int i = 0;i < 100000 - 2; i++) {
+		MessageType msgType = getRandomMsgType();
+		log->message(msgType, "Thread " +
+								std::to_string(id) + " Result");
+	}
+
 	log->info("Thread " + std::to_string(id) +
 			  " ends (delay = " + std::to_string(delay) + ")");
 }
 
-BOOST_AUTO_TEST_CASE( my_test )
+BOOST_AUTO_TEST_CASE(logger_test1) {
+	BOOST_CHECK_EQUAL(1, 1);
+}
+
+BOOST_AUTO_TEST_CASE(logger_test2)
 {
+	const std::string filePath = "myfile.log";
 	Logger *log;
 	try {
-		log = new Logger("myfile.log");
+		log = new Logger(filePath);
 	} catch (const std::exception& e) {
-		std::cerr << "Error: " << e.what() << std::endl;
-		//return 1;
-		exit(1);
+		BOOST_FAIL( e.what() );
 	}
 
 	log->info("Main Thread Begins");
 
 	std::vector<std::thread> threads;
-	int numThreads = 15;
+	const int numThreads = 20;
 
 	for (int i = 0; i < numThreads; i++) {
 		threads.push_back(std::thread(threadFunc, log, i));
@@ -57,7 +81,11 @@ BOOST_AUTO_TEST_CASE( my_test )
 	log->info("Main Thread ends");
 	delete log;
 
+	int count = getFileLines(filePath);
+	BOOST_CHECK_EQUAL(count, 2000003);	
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 /*
 BOOST_AUTO_TEST_CASE( my_test )
@@ -81,6 +109,5 @@ BOOST_AUTO_TEST_CASE( my_test )
     BOOST_CHECK_EQUAL( add( 2,2 ), 4 );	  // #7 continues on error
 }
 
-//BOOST_AUTO_TEST_SUITE_END()
 
 //*/

@@ -5,7 +5,6 @@
 
 Logger::Logger(std::string filePath) : 
 					myqueue(128), 
-					//worker(&Logger::work, this),
 					done(false) {
 	this->fs.open(filePath, std::ofstream::trunc | std::ofstream::out);
 	if (!this->fs.is_open()) throw std::runtime_error("Can't open the file");
@@ -21,7 +20,6 @@ Logger::~Logger() {
 void Logger::write(std::string* text) {
 	if (text == nullptr) return;
 
-	std::cout << *text << std::endl;
 	this->fs << *text << std::endl;
 	delete text;
 }
