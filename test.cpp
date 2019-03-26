@@ -32,12 +32,6 @@ MessageType getRandomMsgType() {
 void threadFunc(Logger* log, int id) {
 	log->info("Thread " + std::to_string(id) + " begins");
 
-	// delay
-	std::random_device rd;
-	std::uniform_int_distribution<int> dist(2, 7);
-	int delay =  dist(rd);
-	std::this_thread::sleep_for(std::chrono::seconds(delay));
-
 	// each thread produces 100000 messages
 	for (int i = 0;i < 100000 - 2; i++) {
 		MessageType msgType = getRandomMsgType();
@@ -45,8 +39,7 @@ void threadFunc(Logger* log, int id) {
 			"Thread " +	std::to_string(id) + " Result from message " + std::to_string(i));
 	}
 
-	log->info("Thread " + std::to_string(id) +
-			  " ends (delay = " + std::to_string(delay) + ")");
+	log->info("Thread " + std::to_string(id) + " ends ");
 }
 
 BOOST_AUTO_TEST_CASE(logger_test1) {
