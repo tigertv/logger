@@ -2,3 +2,5 @@
 
 A simple logger
 
+Requires boost.
+
