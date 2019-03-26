@@ -13,7 +13,7 @@
 
 BOOST_AUTO_TEST_SUITE(LoggerTestSuite)
 
-int getFileLines(std::string filePath) {
+int countFileLines(std::string filePath) {
 	// check lines
 	int count = 0;
 	std::string line;
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(logger_test2)
 	log->info("Main Thread ends");
 	delete log;
 
-	int count = getFileLines(filePath);
+	int count = countFileLines(filePath);
 	BOOST_CHECK_EQUAL(count, 2000003);	
 }
 
