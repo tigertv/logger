@@ -7,8 +7,9 @@
 #include <stdexcept>
 #include "logger.h"
 
-// #include <boost/test/included/unit_test.hpp>
-// using namespace boost::unit_test;
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE MyTest
+#include <boost/test/unit_test.hpp>
 
 void threadFunc(Logger* log, int id) {
 	log->info("Thread " + std::to_string(id) + " begins");
@@ -27,14 +28,15 @@ void threadFunc(Logger* log, int id) {
 			  " ends (delay = " + std::to_string(delay) + ")");
 }
 
-int main(int argc, char **argv) {
+BOOST_AUTO_TEST_CASE( my_test )
+{
 	Logger *log;
-
 	try {
 		log = new Logger("myfile.log");
 	} catch (const std::exception& e) {
 		std::cerr << "Error: " << e.what() << std::endl;
-		return 1;
+		//return 1;
+		exit(1);
 	}
 
 	log->info("Main Thread Begins");
@@ -55,21 +57,30 @@ int main(int argc, char **argv) {
 	log->info("Main Thread ends");
 	delete log;
 
-	return 0;
 }
-
 
 /*
-void free_test_function()
+BOOST_AUTO_TEST_CASE( my_test )
 {
-	BOOST_TEST( true / * test assertion * / );
+    // seven ways to detect and report the same error:
+    BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
+
+    BOOST_REQUIRE( add( 2,2 ) == 4 );      // #2 throws on error
+
+    if( add( 2,2 ) != 4 )
+      BOOST_ERROR( "Ouch..." );            // #3 continues on error
+
+    if( add( 2,2 ) != 4 )
+      BOOST_FAIL( "Ouch..." );             // #4 throws on error
+
+    if( add( 2,2 ) != 4 ) throw "Ouch..."; // #5 throws on error
+
+    BOOST_CHECK_MESSAGE( add( 2,2 ) == 4,  // #6 continues on error
+                         "add(..) result: " << add( 2,2 ) );
+
+    BOOST_CHECK_EQUAL( add( 2,2 ), 4 );	  // #7 continues on error
 }
 
-test_suite* init_unit_test_suite( int / *argc* /, char* / *argv* /[] )
-{
-	framework::master_test_suite().
-	add( BOOST_TEST_CASE( &free_test_function ) );
+//BOOST_AUTO_TEST_SUITE_END()
 
-	return 0;
-}
 //*/

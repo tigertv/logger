@@ -10,20 +10,31 @@ OBJ := $(SRC:.cpp=.o)
 
 .PHONY: all clean 
 
-all: main
+all: liblogger.so
 
 main: main.o liblogger.so
 	$(CXX) -I. -L. $(FLAGS) $< -o $@ -Wl,-rpath=. -llogger -pthread 
 
 liblogger.so: logger.so.o
-	$(CXX) $(FLAGS) -shared -fPIC $< -o $@
+	$(CXX) $(FLAGS) -shared -fPIC $< $(BOOST) -o $@ 
 
 %.so.o: %.cpp
-	$(CXX) $(FLAGS) -c -fPIC $^ -o $@
-	# $(CXX) $(FLAGS) -c -fPIC $^ -o $@ $(BOOST)
+	$(CXX) $(FLAGS) -c -fPIC $^ -o $@ 
 
 %.o: %.cpp 
 	$(CXX) $(FLAGS) -c $< -o $@
 
+test: test.cpp liblogger.so
+	$(CXX) -I. -L. $(FLAGS) $< -Wl,-rpath=. -llogger -pthread -lboost_unit_test_framework -o $@
+
+#test1: test1.cpp
+#	$(CXX) $(FLAGS) $< -o $@
+	
+#test2: test2.cpp
+#	$(CXX) $(FLAGS) $< -o $@
+
+#test3: test3.cpp liblogger.so
+#	$(CXX) -I. -L. $(FLAGS) $< -o $@ -Wl,-rpath=. -llogger -pthread 
+
 clean: 
-	rm -rf $(APP) *.o *.so
+	rm -rf $(APP) *.o *.so test
