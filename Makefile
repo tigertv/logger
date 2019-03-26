@@ -1,4 +1,3 @@
-APP = main
 CXX = g++
 FLAGS = -std=c++17 -Wall -g 
 #SRC_DIR = src
@@ -6,14 +5,12 @@ FLAGS = -std=c++17 -Wall -g
 BOOST = -lboost_atomic -lboost_system -lboost_thread
 SRC = $(wildcard *.cpp)
 #eBIN_DIR = build
+TESTS = test
 OBJ := $(SRC:.cpp=.o)
 
 .PHONY: all clean 
 
 all: liblogger.so
-
-main: main.o liblogger.so
-	$(CXX) -I. -L. $(FLAGS) $< -o $@ -Wl,-rpath=. -llogger -pthread 
 
 liblogger.so: logger.so.o
 	$(CXX) $(FLAGS) -shared -fPIC $< $(BOOST) -o $@ 
@@ -27,14 +24,5 @@ liblogger.so: logger.so.o
 test: test.cpp liblogger.so
 	$(CXX) -I. -L. $(FLAGS) $< -Wl,-rpath=. -llogger -pthread -lboost_unit_test_framework -o $@
 
-#test1: test1.cpp
-#	$(CXX) $(FLAGS) $< -o $@
-	
-#test2: test2.cpp
-#	$(CXX) $(FLAGS) $< -o $@
-
-#test3: test3.cpp liblogger.so
-#	$(CXX) -I. -L. $(FLAGS) $< -o $@ -Wl,-rpath=. -llogger -pthread 
-
 clean: 
-	rm -rf $(APP) *.o *.so test
+	rm -rf *.o *.so $(TESTS)
